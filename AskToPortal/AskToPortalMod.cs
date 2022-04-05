@@ -31,19 +31,19 @@ namespace AskToPortal
             if (MelonHandler.Mods.Any(mod => mod.Info.Name == "Portal Confirmation"))
             {
                 LoggerInstance.Warning("Use of Portal Confirmation by 404 was detected! AskToPortal is NOT Portal Confirmation. AskToPortal is simply a replacement for Portal Confirmation as 404 was BANNED from the VRChat Modding Group. If you wish to use this mod please DELETE Portal Confirmation.");
+                LoggerInstance.Warning("Maroon edit: The mod will continue to start as usual, just because I can. It's not the Modding Group's place to decide what mods from what authors you're allowed to run. Run 404's stuff if you want, though I'd recommend to stick to only the open-source ones.");
+
             }
-            else
-            {
-                PortalUtils.Init();
 
-                HarmonyInstance.Patch(PortalUtils.enterPortal, prefix: new HarmonyMethod(typeof(AskToPortalMod).GetMethod("OnPortalEnter", BindingFlags.Static | BindingFlags.Public)));
-                HarmonyInstance.Patch(typeof(PortalInternal).GetMethod("ConfigurePortal"), prefix: new HarmonyMethod(typeof(AskToPortalMod).GetMethod("OnPortalDropped", BindingFlags.Static | BindingFlags.Public)));
-                HarmonyInstance.Patch(typeof(PortalInternal).GetMethod("OnDestroy"), prefix: new HarmonyMethod(typeof(AskToPortalMod).GetMethod("OnPortalDestroyed", BindingFlags.Static | BindingFlags.Public)));
+            PortalUtils.Init();
 
-                VRCUtils.OnUiManagerInit += OnUiManagerInit;
+            HarmonyInstance.Patch(PortalUtils.enterPortal, prefix: new HarmonyMethod(typeof(AskToPortalMod).GetMethod("OnPortalEnter", BindingFlags.Static | BindingFlags.Public)));
+            HarmonyInstance.Patch(typeof(PortalInternal).GetMethod("ConfigurePortal"), prefix: new HarmonyMethod(typeof(AskToPortalMod).GetMethod("OnPortalDropped", BindingFlags.Static | BindingFlags.Public)));
+            HarmonyInstance.Patch(typeof(PortalInternal).GetMethod("OnDestroy"), prefix: new HarmonyMethod(typeof(AskToPortalMod).GetMethod("OnPortalDestroyed", BindingFlags.Static | BindingFlags.Public)));
 
-                LoggerInstance.Msg("Initialized!");
-            }
+            VRCUtils.OnUiManagerInit += OnUiManagerInit;
+
+            LoggerInstance.Msg("Initialized!");
         }
         private void OnUiManagerInit()
         {

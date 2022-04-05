@@ -137,8 +137,18 @@ namespace VRChatUtilityKit.Utilities
         private static void StartEmmCheck(ApiWorld world)
         {
             // Check if black/whitelisted from emmVRC - thanks Emilia and the rest of emmVRC Staff
-            HttpWebRequest request = WebRequest.CreateHttp($"https://dl.emmvrc.com/riskyfuncs.php?worldid={world.id}");
-            request.BeginGetResponse(new AsyncCallback(EndEmmCheck), new Tuple<ApiWorld, HttpWebRequest>(world, request));
+            //HttpWebRequest request = WebRequest.CreateHttp($"https://dl.emmvrc.com/riskyfuncs.php?worldid={world.id}");
+            //request.BeginGetResponse(new AsyncCallback(EndEmmCheck), new Tuple<ApiWorld, HttpWebRequest>(world, request));
+
+
+
+            // DON'T check if black/whitelisted from emmVRC. Every world is judged locally, equally and fairly.
+            // This way, server problems will not cause results to change,
+            // and results cannot potentially be manipulated (by time of day, IP, world, etc...)
+
+            // Having checks be made through a server with no public checking code is not necessary.
+
+            AsyncUtils._toMainThreadQueue.Enqueue(new Action(() => CheckWorld(world)));
         }
 
         private static void EndEmmCheck(IAsyncResult asyncResult)
@@ -180,35 +190,47 @@ namespace VRChatUtilityKit.Utilities
 
         private static void CheckWorld(ApiWorld world)
         {
-            // no result from server or they're currently down
-            // Check tags/GameObjects then.
-            if (GameObject.Find("eVRCRiskFuncEnable") != null
-                || GameObject.Find("UniversalRiskyFuncEnable") != null)
-            {
-                AreRiskyFunctionsAllowed = true;
-                return;
+            AreRiskyFunctionsAllowed = true;
 
-            } 
-            if (GameObject.Find("eVRCRiskFuncDisable") != null
-                  || GameObject.Find("UniversalRiskyFuncDisable") != null)
+
+
+            if (GameObject.Find("eVRCRiskFuncDisable") != null || GameObject.Find("UniversalRiskyFuncDisable") != null)
             {
                 AreRiskyFunctionsAllowed = false;
-                return;
             }
 
             foreach (string worldTag in world.tags)
             {
-                if (worldTag.ToLower().Contains("game")
-                    || worldTag.ToLower().Contains("club"))
+                if (worldTag.ToLower().Contains("game") || worldTag.ToLower().Contains("games") || worldTag.ToLower().Contains("club"))
                 {
-                    VRChatUtilityKitMod.Instance.LoggerInstance.Msg("World NOT allowed to use risky functions");
                     AreRiskyFunctionsAllowed = false;
-                    return;
                 }
             }
 
-            VRChatUtilityKitMod.Instance.LoggerInstance.Msg("World allowed to use risky functions");
-            AreRiskyFunctionsAllowed = true;
+            if (GameObject.Find("eVRCRiskFuncEnable") != null || GameObject.Find("UniversalRiskyFuncEnable") != null)
+            {
+                AreRiskyFunctionsAllowed = true;
+            }
+
+            if (RoomManager.field_Internal_Static_ApiWorldInstance_0?.type != InstanceAccessType.Public)
+            {
+                AreRiskyFunctionsAllowed = true;
+            }
+
+                // For debugging only, please do not uncomment!
+                // AreRiskyFunctionsAllowed = true;
+
+
+
+                if (AreRiskyFunctionsAllowed == true)
+            {
+                VRChatUtilityKitMod.Instance.LoggerInstance.Msg("World allowed to use risky functions");
+            }
+            else
+            {
+                VRChatUtilityKitMod.Instance.LoggerInstance.Msg("World NOT allowed to use risky functions");
+            }
+            return;
         }
 
         /// <summary>
