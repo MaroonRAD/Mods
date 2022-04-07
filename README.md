@@ -1,3 +1,14 @@
+This is a fork of the [Sleepers VRC Mods](https://github.com/SleepyVRC/Mods) repository, for the sake of making a few edits.
+
+Current edits:
+* VRChatUtilityKit-Offline removes emm check and uses less restrictive local check instead
+* AskToPortal 404 warning changed to not close game (it just isn't nice to basically blacklist a mod creator like that)
+* * No guarantees that it's compatible with 404's, though (hence no DLL in releases)
+
+
+
+Original readme below:  
+
 # Sleepers VRC Mods<!-- omit in toc -->
 
 These are mods that weren't being maintained anymore, gathered together.
